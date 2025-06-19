@@ -24,11 +24,16 @@
 			<div class="text-center">No project yet</div>
 		</div>
 	{:else}
-		<img src={project.image} class="w-full h-60 object-cover rounded" alt={project.title} />
+		<div class="w-full h-60 flex flex-col justify-center text-center font-bold text-zinc-400 overflow-hidden rounded">
+			{#if project.image.length === 0}
+				<div class="h-full flex items-center justify-center leading-none text-sm p-0 m-0">No image provided</div>
+			{:else}
+				<img src={project.image} class="w-full h-full object-cover" alt={project.title} />
+			{/if}
+		</div>
 		<h1 class="font-bold text-xl mt-2">{project.title}</h1>
 		<p>{project.description}</p>
-		<div class="flex h-full"></div>
-		<div class="flex gap-2 justify-evenly">
+		<div class="flex gap-2 justify-evenly mt-auto">
 			<button class="p-2 rounded cursor-pointer bg-zinc-800" onclick={openInEditor}>Open in Editor</button>
 			<button class="p-2 rounded cursor-pointer bg-zinc-800" onclick={openGitHub}>Open on github</button>
 		</div>

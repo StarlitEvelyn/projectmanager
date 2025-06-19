@@ -14,6 +14,7 @@
 
 	const openGitHub = async () => {
 		await openUrl(project!.githubUrl);
+		console.log(`Opening ${project!.githubUrl}`);
 	};
 </script>
 

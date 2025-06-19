@@ -1,10 +1,47 @@
 <script lang="ts">
 	import ProjectDetails from "@components/ProjectDetails.svelte";
 	import ProjectList from "@components/ProjectList.svelte";
-
+	import { readDir, readFile } from "@tauri-apps/plugin-fs";
+	import type { Project } from "@type/project";
 	let index = $state(0);
 
-	const projects = [
+	let projects: Project[] = $state([]);
+
+	const getProjects = async () => {
+		const contents = await readDir("D:\\Projects");
+		const folders = contents.filter((item) => item.isDirectory === true);
+		folders.forEach(async (folder) => {
+			const getPm = (await readDir(`D:\\Projects\\${folder.name}`)).find((item) => item.name === ".pm");
+			if (!getPm) {
+				projects.push({
+					title: folder.name,
+					image: "",
+					description: "An unknown project",
+					githubUrl: "",
+					path: "",
+				});
+				return;
+			}
+			const getConfig = await readFile(`D:\\Projects\\${folder.name}\\.pm\\config.json`);
+
+			const configStr = new TextDecoder().decode(getConfig);
+			const readConfig = JSON.parse(configStr);
+
+			projects.push({
+				title: folder.name,
+				image: readConfig.image ?? "",
+				description: readConfig.description ?? "",
+				githubUrl: readConfig.githubUrl ?? "",
+				path: `D:\\Projects\\${folder.name}`,
+			});
+		});
+		projects = projects; // Update state
+		// Go through each folder and look for .pm folder
+	};
+
+	getProjects();
+
+	/*const projects = [
 		{
 			title: "Project 123",
 			image: "https://i.pinimg.com/736x/55/4b/5a/554b5a10f09b6b903750bb4be968ac1c.jpg",
@@ -47,7 +84,7 @@
 			githubUrl: "https://google.com",
 			path: "D:\\Projects\\homedash",
 		},
-	];
+	];*/
 </script>
 
 <main class="flex bg-zinc-800 w-full h-full overflow-hidden">

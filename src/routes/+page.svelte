@@ -11,11 +11,11 @@
 
 <main class="flex bg-zinc-800 w-full h-full overflow-hidden">
 	{#await projectPromise}
-		<p>Loading projects...</p>
+		<div class="flex justify-center items-center text-white w-full h-full">Loading projects...</div>
 	{:then projects}
 		<ProjectList {projects} bind:index />
 		<ProjectDetails project={projects[index] ?? null} />
 	{:catch error}
-		<p>Error loading projects: {error.message}</p>
+		<div class="flex justify-center items-center text-white w-full h-full">Error loading projects: {error.message}</div>
 	{/await}
 </main>

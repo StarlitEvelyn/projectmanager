@@ -30,25 +30,57 @@ const defaulProjectProperties: Project = {
 	description: 'An unknown project',
 	githubUrl: '',
 	path: '',
+	tags: [],
 };
 
-async function discoverProjectsInPath(path: string): Promise<Project[]> {
+type ProjectConfig = {
+	type: 'project';
+	title: string;
+	image?: string;
+	description?: string;
+	githubUrl?: string;
+	tags?: string[];
+};
+
+type LibraryConfig = {
+	type: 'library';
+	ignore: string[];
+	tags?: string[];
+};
+
+type PmConfig = ProjectConfig | LibraryConfig;
+
+async function discoverProjectsInPath(
+	path: string,
+	tags: string[] = [],
+): Promise<Project[]> {
 	const contents = await readDir(path);
 	const folders = contents.filter((item) => item.isDirectory);
 
 	let ignoredFolders: string[] = [];
-	const hasIgnoreList = contents.some(
-		(item) => item.isFile && item.name === '.pmignore',
-	);
-	if (hasIgnoreList) {
-		const ignoreListPath = await join(path, '.pmignore');
-		const ignoreListRaw = await readTextFile(ignoreListPath);
-		ignoredFolders = ignoreListRaw.split('\n').map((line) => line.trim());
+	if (folders.some((item) => item.name === '.pm')) {
+		// If the .pm folder is present, we are in a project root
+		const pmConfigPath = await join(path, '.pm', 'config.json');
+		const pmConfigRaw = await readTextFile(pmConfigPath);
+		const pmConfig = JSON.parse(pmConfigRaw) as PmConfig;
+
+		if (pmConfig.type === 'project') {
+			return [];
+		}
+
+		if (pmConfig.type === 'library') {
+			ignoredFolders = pmConfig.ignore || [];
+			tags = [...(pmConfig.tags || []), ...tags];
+		}
 	}
 
 	let projects: Project[] = [];
 
 	for (const folder of folders) {
+		if (folder.name === '.pm') {
+			continue;
+		}
+
 		const folderPath = await join(path, folder.name);
 		const fileContents = await readDir(folderPath);
 		const shouldBeIgnored = ignoredFolders.includes(folder.name);
@@ -81,7 +113,24 @@ async function discoverProjectsInPath(path: string): Promise<Project[]> {
 			continue;
 		}
 
-		const pmConfig = JSON.parse(pmConfigRaw);
+		const pmConfig = JSON.parse(pmConfigRaw) as PmConfig;
+		const projectTags = [...(pmConfig.tags || []), ...tags];
+
+		if (pmConfig.type === 'library') {
+			const subprojects = await discoverProjectsInPath(folderPath, tags);
+			projects.push(...subprojects);
+			continue;
+		}
+
+		if (pmConfig.type !== 'project') {
+			projects.push({
+				...defaulProjectProperties,
+				title: folder.name,
+				path: folderPath,
+				tags: projectTags,
+			});
+			continue;
+		}
 
 		projects.push({
 			title: folder.name,
@@ -89,6 +138,7 @@ async function discoverProjectsInPath(path: string): Promise<Project[]> {
 			description: pmConfig.description ?? 'No description',
 			githubUrl: pmConfig.githubUrl ?? '',
 			path: folderPath,
+			tags: pmConfig.tags ?? [],
 		});
 	}
 

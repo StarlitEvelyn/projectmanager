@@ -1,9 +1,8 @@
-type Project = {
+export type Project = {
 	title: string;
 	image: string;
 	description: string;
 	githubUrl: string;
 	path: string;
+	tags: string[];
 };
-
-export type { Project };

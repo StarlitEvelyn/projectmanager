@@ -31,6 +31,11 @@
 				<img src={project.image} class="w-full h-full object-cover" alt={project.title} />
 			{/if}
 		</div>
+		<div class="flex gap-1">
+			{#each project.tags as tag}
+				<span class="bg-zinc-800 text-zinc-400 rounded px-2 py-1 text-sm">{tag}</span>
+			{/each}
+		</div>
 		<h1 class="font-bold text-xl mt-2">{project.title}</h1>
 		<p>{project.description}</p>
 		<div class="flex gap-2 justify-evenly mt-auto">

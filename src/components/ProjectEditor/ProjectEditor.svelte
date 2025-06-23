@@ -1,9 +1,12 @@
 <script lang="ts">
 	import { convertFileSrc } from "@tauri-apps/api/core";
-	import { copyFile } from "@tauri-apps/plugin-fs";
 	import type { Project } from "@type/project";
 	import { Save } from "lucide-svelte";
 	import { open } from "@tauri-apps/plugin-dialog";
+	import { saveImage, saveProject } from "$lib/project/project-saver";
+	import { loadProjects } from "$lib/project/project-state.svelte";
+	import { join } from "@tauri-apps/api/path";
+	import { projectImage } from "$lib/project/project-image";
 
 	type Props = {
 		project: Project;
@@ -11,7 +14,10 @@
 	};
 	let { project, show = $bindable() }: Props = $props();
 
-	const save = (e: any) => {
+	let imagePath: string | null = null;
+	let image = $state(projectImage(project));
+
+	const save = async (e: any) => {
 		e.preventDefault();
 		show = false;
 
@@ -29,14 +35,20 @@
 			project[key] = data[key];
 		});
 
-		console.log(data);
-		// TODO save data
+		if (imagePath) {
+			const split = imagePath.split(".");
+			const extension = split[split.length - 1];
+			project.image = await join(".pm", `image.${extension}`);
+		}
+
+		await saveProject(project);
+		if (imagePath) await saveImage(project, imagePath);
+		await loadProjects();
+		// TODO save image to .pm folder
 	};
 
-	let image = $state(project!.image);
-
 	const getImage = async () => {
-		const path = await open({
+		imagePath = await open({
 			muliple: false,
 			directory: false,
 			filters: [
@@ -47,9 +59,9 @@
 			],
 		});
 
-		if (!path) return; // Make sure a file was selected
+		if (!imagePath) return; // Make sure a file was selected
 
-		const url = convertFileSrc(path ?? "");
+		const url = convertFileSrc(imagePath ?? "");
 		image = url ?? image;
 	};
 
@@ -71,8 +83,8 @@
 		<input type="text" name="title" id="title" class="rounded border-1 border-[#aaaaaa] px-2 py-1" defaultvalue={project.title} />
 		<label for="description">Description</label>
 		<textarea id="description" name="description" class="rounded border-1 border-[#aaaaaa] px-1 py-1 resize-none">{project.description} </textarea>
-		<label for="githubURL">Github URL</label>
-		<input type="text" name="githubURL" id="githubUrl" class="rounded border-1 border-[#aaaaaa] px-2 py-1" defaultvalue={project.githubUrl} />
+		<label for="githubUrl">Github URL</label>
+		<input type="text" name="githubUrl" id="githubUrl" class="rounded border-1 border-[#aaaaaa] px-2 py-1" defaultvalue={project.githubUrl} />
 		<button type="submit" class="flex gap-2 font-bold p-2 cursor-pointer justify-center items-center bg-zinc-800 w-full h-8 rounded mt-auto">
 			<Save /> Save
 		</button>

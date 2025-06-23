@@ -126,7 +126,7 @@ async function discoverProjectsInPath(path: string, tags: string[] = []): Promis
 		}
 
 		projects.push({
-			title: folder.name,
+			title: pmConfig.title ?? folder.name,
 			image: pmConfig.image ?? "",
 			description: pmConfig.description ?? "No description",
 			githubUrl: pmConfig.githubUrl ?? "",

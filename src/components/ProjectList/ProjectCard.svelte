@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { projectImage } from "$lib/project/project-image";
 	import type { Project } from "@type/project.ts";
 
 	type Props = {
@@ -13,7 +14,7 @@
 	{#if project.image.length === 0}
 		<div class="w-full h-28 flex flex-col justify-center text-center font-bold text-zinc-400">No image provided</div>
 	{:else}
-		<img src={project.image} class="w-full h-28 object-cover rounded-t" alt={project.title} />
+		<img src={projectImage(project)} class="w-full h-28 object-cover rounded-t" alt={project.title} />
 	{/if}
 	<h1 class="font-bold overflow-hidden text-ellipsis text-nowrap text-lg" title={project.title}>
 		{project.title}

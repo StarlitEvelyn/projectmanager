@@ -5,4 +5,5 @@ export type Project = {
 	githubUrl: string;
 	path: string;
 	tags: string[];
+	hasConfig: boolean;
 };

@@ -1,18 +1,23 @@
 {
-	"$schema": "../gen/schemas/desktop-schema.json",
-	"identifier": "default",
-	"description": "Capability for the main window",
-	"windows": ["main"],
-	"permissions": [
-		"core:default",
-		"opener:default",
-		"opener:allow-open-path",
-		"fs:read-all",
-		"fs:write-all",
-		{
-			"identifier": "fs:scope",
-			"allow": ["**"]
-		},
-		"store:default"
-	]
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "default",
+  "description": "Capability for the main window",
+  "windows": [
+    "main"
+  ],
+  "permissions": [
+    "core:default",
+    "opener:default",
+    "opener:allow-open-path",
+    "fs:read-all",
+    "fs:write-all",
+    {
+      "identifier": "fs:scope",
+      "allow": [
+        "**"
+      ]
+    },
+    "store:default",
+    "dialog:default"
+  ]
 }

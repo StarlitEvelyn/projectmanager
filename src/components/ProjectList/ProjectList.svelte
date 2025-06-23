@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { Project } from "@type/project";
-	import ProjectCard from "./ProjectList/ProjectCard.svelte";
-	import SearchBar from "./ProjectList/SearchBar.svelte";
+	import ProjectCard from "./ProjectCard.svelte";
+	import SearchBar from "./SearchBar.svelte";
 
 	type Props = {
 		projects: Project[];

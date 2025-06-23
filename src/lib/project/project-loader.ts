@@ -1,7 +1,7 @@
-import { getSettings } from '$lib/settings.svelte';
-import { join } from '@tauri-apps/api/path';
-import { readDir, readTextFile } from '@tauri-apps/plugin-fs';
-import type { Project } from '@type/project';
+import { getSettings } from "$lib/settings.svelte";
+import { join } from "@tauri-apps/api/path";
+import { readDir, readTextFile } from "@tauri-apps/plugin-fs";
+import type { Project } from "@type/project";
 
 export async function discoverProjects(): Promise<Project[]> {
 	const settings = await getSettings();
@@ -12,10 +12,7 @@ export async function discoverProjects(): Promise<Project[]> {
 			try {
 				return await discoverProjectsInPath(path);
 			} catch (error) {
-				console.error(
-					`Error discovering projects in path ${path}:`,
-					error,
-				);
+				console.error(`Error discovering projects in path ${path}:`, error);
 				return [];
 			}
 		}),
@@ -25,16 +22,17 @@ export async function discoverProjects(): Promise<Project[]> {
 }
 
 const defaulProjectProperties: Project = {
-	title: 'Unknown Project',
-	image: '',
-	description: 'An unknown project',
-	githubUrl: '',
-	path: '',
+	title: "Unknown Project",
+	image: "",
+	description: "An unknown project",
+	githubUrl: "",
+	path: "",
 	tags: [],
+	hasConfig: false,
 };
 
 type ProjectConfig = {
-	type: 'project';
+	type: "project";
 	title: string;
 	image?: string;
 	description?: string;
@@ -43,32 +41,29 @@ type ProjectConfig = {
 };
 
 type LibraryConfig = {
-	type: 'library';
+	type: "library";
 	ignore: string[];
 	tags?: string[];
 };
 
 type PmConfig = ProjectConfig | LibraryConfig;
 
-async function discoverProjectsInPath(
-	path: string,
-	tags: string[] = [],
-): Promise<Project[]> {
+async function discoverProjectsInPath(path: string, tags: string[] = []): Promise<Project[]> {
 	const contents = await readDir(path);
 	const folders = contents.filter((item) => item.isDirectory);
 
 	let ignoredFolders: string[] = [];
-	if (folders.some((item) => item.name === '.pm')) {
+	if (folders.some((item) => item.name === ".pm")) {
 		// If the .pm folder is present, we are in a project root
-		const pmConfigPath = await join(path, '.pm', 'config.json');
+		const pmConfigPath = await join(path, ".pm", "config.json");
 		const pmConfigRaw = await readTextFile(pmConfigPath);
 		const pmConfig = JSON.parse(pmConfigRaw) as PmConfig;
 
-		if (pmConfig.type === 'project') {
+		if (pmConfig.type === "project") {
 			return [];
 		}
 
-		if (pmConfig.type === 'library') {
+		if (pmConfig.type === "library") {
 			ignoredFolders = pmConfig.ignore || [];
 			tags = [...(pmConfig.tags || []), ...tags];
 		}
@@ -77,7 +72,7 @@ async function discoverProjectsInPath(
 	let projects: Project[] = [];
 
 	for (const folder of folders) {
-		if (folder.name === '.pm') {
+		if (folder.name === ".pm") {
 			continue;
 		}
 
@@ -88,9 +83,7 @@ async function discoverProjectsInPath(
 			continue;
 		}
 
-		const hasPmConfig = fileContents.some(
-			(item) => item.name === '.pm' && item.isDirectory,
-		);
+		const hasPmConfig = fileContents.some((item) => item.name === ".pm" && item.isDirectory);
 
 		if (!hasPmConfig) {
 			projects.push({
@@ -101,7 +94,7 @@ async function discoverProjectsInPath(
 			continue;
 		}
 
-		const pmConfigPath = await join(folderPath, '.pm', 'config.json');
+		const pmConfigPath = await join(folderPath, ".pm", "config.json");
 		const pmConfigRaw = await readTextFile(pmConfigPath);
 
 		if (!pmConfigRaw) {
@@ -116,13 +109,13 @@ async function discoverProjectsInPath(
 		const pmConfig = JSON.parse(pmConfigRaw) as PmConfig;
 		const projectTags = [...(pmConfig.tags || []), ...tags];
 
-		if (pmConfig.type === 'library') {
+		if (pmConfig.type === "library") {
 			const subprojects = await discoverProjectsInPath(folderPath, tags);
 			projects.push(...subprojects);
 			continue;
 		}
 
-		if (pmConfig.type !== 'project') {
+		if (pmConfig.type !== "project") {
 			projects.push({
 				...defaulProjectProperties,
 				title: folder.name,
@@ -134,11 +127,12 @@ async function discoverProjectsInPath(
 
 		projects.push({
 			title: folder.name,
-			image: pmConfig.image ?? '',
-			description: pmConfig.description ?? 'No description',
-			githubUrl: pmConfig.githubUrl ?? '',
+			image: pmConfig.image ?? "",
+			description: pmConfig.description ?? "No description",
+			githubUrl: pmConfig.githubUrl ?? "",
 			path: folderPath,
 			tags: pmConfig.tags ?? [],
+			hasConfig: true,
 		});
 	}
 

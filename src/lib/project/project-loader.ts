@@ -18,13 +18,21 @@ export async function discoverProjects(): Promise<Project[]> {
 		}),
 	);
 
-	return projects.flat();
+	// Sorts projects that the known ones are at the start
+	return projects.flat().sort((a, b) => {
+		// projects with config at start
+		if (a.hasConfig && !b.hasConfig) return -1;
+		if (!a.hasConfig && b.hasConfig) return 1;
+
+		// Sort aplhabeticaly
+		return a.title.localeCompare(b.title, undefined, { sensitivity: "base" });
+	});
 }
 
 const defaulProjectProperties: Project = {
 	title: "Unknown Project",
 	image: "",
-	description: "An unknown project",
+	description: "An unimported project",
 	githubUrl: "",
 	path: "",
 	tags: [],

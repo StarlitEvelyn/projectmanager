@@ -3,7 +3,7 @@
 	import ProjectDetails from "@components/ProjectDetails/ProjectDetails.svelte";
 	import ProjectList from "@components/ProjectList/ProjectList.svelte";
 	import { getCurrentWindow, PhysicalSize } from "@tauri-apps/api/window";
-	let index = $state(0);
+	let secletedIndex = $state(0);
 
 	// Make sure is at least 600px by 600px
 	const setWindowSize = async () => {
@@ -18,9 +18,9 @@
 	{#if projects.loading}
 		<div class="flex justify-center items-center text-white w-full h-full">Loading projects...</div>
 	{:else}
-		<ProjectList projects={projects.projects} bind:index />
-		{#key index}
-			<ProjectDetails project={projects.projects[index] ?? null} />
+		<ProjectList projects={projects.projects} bind:secletedIndex />
+		{#key projects.projects[secletedIndex].path}
+			<ProjectDetails project={projects.projects[secletedIndex] ?? null} />
 		{/key}
 	{/if}
 	<!-- <div class="flex justify-center items-center text-white w-full h-full">Error loading projects: {error.message}</div> -->

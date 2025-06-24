@@ -5,31 +5,29 @@
 
 	type Props = {
 		projects: Project[];
-		index: number;
+		secletedIndex: number;
 	};
 
-	let { projects, index = $bindable() }: Props = $props();
+	let { projects, secletedIndex = $bindable() }: Props = $props();
 
 	let query = $state("");
 
 	let search = (query: string) => {
 		query = query.toLowerCase().trim();
-		if (query.length === 0) return projects;
+		if (query.length === 0) return projects.map((p, i) => ({ project: p, index: i }));
 
-		return projects.filter((project) => {
-			return project.title.toLowerCase().trim().includes(query) || project.description.includes(query);
-		});
+		return projects.map((p, i) => ({ project: p, index: i })).filter(({ project }) => project.title.toLowerCase().includes(query) || project.description.includes(query));
 	};
 </script>
 
 <div class="h-screen w-screen flex flex-col">
 	<SearchBar bind:query />
 	<div class="h-max gap-2 p-2 grid grid-cols-[repeat(auto-fit,_minmax(200px,_1fr))] overflow-y-scroll">
-		{#each search(query) as project, i}
+		{#each search(query) as { project, index }}
 			<ProjectCard
 				{project}
 				onclick={() => {
-					index = i;
+					secletedIndex = index;
 				}}
 			/>
 		{/each}

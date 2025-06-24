@@ -21,6 +21,7 @@
 		e.preventDefault();
 		show = false;
 
+		// Get data from form
 		const form = e.target;
 		const formData = new FormData(form);
 		const data = Object.fromEntries(formData.entries()) as Data;
@@ -31,23 +32,30 @@
 			description: string;
 		};
 
+		// Transfer all edited values to the project
 		(Object.keys(data) as (keyof Data)[]).forEach((key) => {
-			project[key] = data[key];
+			project[key] = data[key].trim();
 		});
 
+		// If image was changed, imagePath will not be null,
+		// we update project's image path to the .pm/image.extension
 		if (imagePath) {
 			const split = imagePath.split(".");
 			const extension = split[split.length - 1];
 			project.image = await join(".pm", `image.${extension}`);
 		}
 
+		// Save config file
 		await saveProject(project);
+		// Save image to .pm folder
 		if (imagePath) await saveImage(project, imagePath);
+
+		// Reload projects for updated data to be loaded
 		await loadProjects();
-		// TODO save image to .pm folder
 	};
 
 	const getImage = async () => {
+		// Open dialog, requesting a png or a jpg
 		imagePath = await open({
 			muliple: false,
 			directory: false,
@@ -59,8 +67,10 @@
 			],
 		});
 
-		if (!imagePath) return; // Make sure a file was selected
+		// Make sure a file was selected
+		if (!imagePath) return;
 
+		// Convert file to url for tauri to not complain
 		const url = convertFileSrc(imagePath ?? "");
 		image = url ?? image;
 	};

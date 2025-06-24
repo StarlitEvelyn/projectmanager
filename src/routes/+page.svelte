@@ -2,7 +2,14 @@
 	import { loadProjects, projects } from "$lib/project/project-state.svelte";
 	import ProjectDetails from "@components/ProjectDetails/ProjectDetails.svelte";
 	import ProjectList from "@components/ProjectList/ProjectList.svelte";
+	import { getCurrentWindow, PhysicalSize } from "@tauri-apps/api/window";
 	let index = $state(0);
+
+	// Make sure is at least 600px by 600px
+	const setWindowSize = async () => {
+		await getCurrentWindow().setMinSize(new PhysicalSize(600, 600));
+	};
+	setWindowSize();
 
 	loadProjects();
 </script>

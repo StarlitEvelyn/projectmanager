@@ -32,7 +32,7 @@
 	};
 </script>
 
-<div class="h-screen w-screen flex flex-col">
+<div class="h-screen w-screen flex flex-col relative">
 	<div class="flex items-center">
 		<SearchBar bind:query />
 		<button
@@ -55,5 +55,11 @@
 				}}
 			/>
 		{/each}
+	</div>
+	<div
+		class="flex flex-col text-center absolute bottom-2 right-2 text-white px-2 pb-1 rounded bg-zinc-800 border-1 border-black z-20"
+	>
+		{search(query).length} / {projects.length}
+		<span class="text-xs">Showing</span>
 	</div>
 </div>

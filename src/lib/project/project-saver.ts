@@ -3,7 +3,11 @@ import { copyFile, exists, mkdir, writeTextFile } from "@tauri-apps/plugin-fs";
 import type { Project } from "@type/project";
 import type { Optional } from "@type/utils";
 
-export async function saveData(e: any, project: Project, imagePath: string | null) {
+export async function saveData(
+	e: any,
+	project: Project,
+	imagePath: string | null,
+) {
 	e.preventDefault();
 
 	// Get data from form
@@ -15,12 +19,17 @@ export async function saveData(e: any, project: Project, imagePath: string | nul
 		title: string;
 		githubUrl: string;
 		description: string;
+		tags: string;
 	};
 
 	// Transfer all edited values to the project
-	(Object.keys(data) as (keyof Data)[]).forEach((key) => {
-		project[key] = data[key].trim();
-	});
+	project.title = data.title.trim();
+	project.githubUrl = data.githubUrl.trim();
+	project.description = data.description.trim();
+	project.tags = data.tags
+		.split(",")
+		.map((tag) => tag.trim())
+		.filter(Boolean);
 
 	// If image was changed, imagePath will not be null,
 	// we update project's image path to the .pm/image.extension

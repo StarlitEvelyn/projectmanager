@@ -65,24 +65,62 @@
 	}
 </script>
 
-<div class={`${show ? "block" : "hidden"} flex flex-col z-10 p-2 backdrop-blur bg-[#000000AA] absolute rounded-l top-0 right-0 h-full w-full`}>
+<div
+	class={`${show ? "block" : "hidden"} flex flex-col z-10 p-2 backdrop-blur bg-[#000000AA] absolute rounded-l top-0 right-0 h-full w-full`}
+>
 	<form class="flex flex-col h-full" onsubmit={save}>
 		<button onclick={getImage} class="text-start font-bold" type="button">
 			Cover image
 			{#if !image}
-				<div class="h-50 flex items-center justify-center leading-none text-sm my-1">No image provided</div>
+				<div
+					class="h-50 flex items-center justify-center leading-none text-sm my-1"
+				>
+					No image provided
+				</div>
 			{:else}
-				<img src={image} class="w-full h-50 rounded my-1 object-cover" alt={project!.title} />
+				<img
+					src={image}
+					class="w-full h-50 rounded my-1 object-cover"
+					alt={project!.title}
+				/>
 			{/if}
 		</button>
 
 		<label for="title">Title</label>
-		<input type="text" name="title" id="title" class="rounded border-1 border-[#aaaaaa] px-2 py-1" defaultvalue={project.title} />
+		<input
+			type="text"
+			name="title"
+			id="title"
+			class="rounded border-1 border-[#aaaaaa] px-2 py-1"
+			defaultvalue={project.title}
+		/>
+		<label for="tags">Tags</label>
+		<input
+			type="text"
+			name="tags"
+			id="tags"
+			class="rounded border-1 border-[#aaaaaa] px-2 py-1"
+			defaultvalue={project.tags.join(", ")}
+		/>
 		<label for="description">Description</label>
-		<textarea id="description" name="description" class="rounded border-1 border-[#aaaaaa] px-1 py-1 resize-none">{project.description} </textarea>
+		<textarea
+			id="description"
+			name="description"
+			class="rounded border-1 border-[#aaaaaa] px-1 py-1 resize-none"
+			>{project.description}
+		</textarea>
 		<label for="githubUrl">Github URL</label>
-		<input type="text" name="githubUrl" id="githubUrl" class="rounded border-1 border-[#aaaaaa] px-2 py-1" defaultvalue={project.githubUrl} />
-		<button type="submit" class="flex gap-2 font-bold p-2 cursor-pointer justify-center items-center bg-zinc-800 w-full h-8 rounded mt-auto">
+		<input
+			type="text"
+			name="githubUrl"
+			id="githubUrl"
+			class="rounded border-1 border-[#aaaaaa] px-2 py-1"
+			defaultvalue={project.githubUrl}
+		/>
+		<button
+			type="submit"
+			class="flex gap-2 font-bold p-2 cursor-pointer justify-center items-center bg-zinc-800 w-full h-8 rounded mt-auto"
+		>
 			<Save /> Save
 		</button>
 	</form>

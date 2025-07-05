@@ -16,10 +16,12 @@
 
 <main class="flex bg-zinc-800 w-full h-full overflow-hidden">
 	{#if projects.loading}
-		<div class="flex justify-center items-center text-white w-full h-full">Loading projects...</div>
+		<div class="flex justify-center items-center text-white w-full h-full">
+			Loading projects...
+		</div>
 	{:else}
 		<ProjectList projects={projects.projects} bind:secletedIndex />
-		{#key projects.projects[secletedIndex].path}
+		{#key projects.projects[secletedIndex]?.path}
 			<ProjectDetails project={projects.projects[secletedIndex] ?? null} />
 		{/key}
 	{/if}

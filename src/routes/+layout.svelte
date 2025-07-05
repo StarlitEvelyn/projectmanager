@@ -1,8 +1,8 @@
 <script lang="ts">
-	import { initSettings } from '$lib/settings.svelte';
+	import "../styles/global.css";
+	import { initSettings } from "$lib/settings.svelte";
 
 	const { children } = $props();
-
 
 	initSettings();
 </script>

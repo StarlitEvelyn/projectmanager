@@ -23,26 +23,52 @@ fn open_vscode(path: Option<String>) -> Result<(), String> {
 
 #[tauri::command]
 fn get_git(path: String) -> Result<Option<String>, String> {
-    use std::process::Command;
+    use std::io::Read;
+    use std::process::{Command, Stdio};
+    use std::time::Duration;
+    use wait_timeout::ChildExt;
 
-    let output = Command::new("git")
-        .args(&["remote", "get-url", "origin"])
-        .current_dir(path)
-        .output();
+    #[cfg(windows)]
+    use std::os::windows::process::CommandExt;
 
-    match output {
-        Ok(output) => {
-            if output.status.success() {
-                let url = String::from_utf8_lossy(&output.stdout).trim().to_string();
-                Ok(Some(url))
+    fn spawn_git_hidden(path: &str) -> Option<std::process::Child> {
+        let mut cmd = Command::new("git");
+        cmd.args(&["remote", "get-url", "origin"])
+            .current_dir(path)
+            .stdout(Stdio::piped())
+            .stderr(Stdio::null());
+
+        #[cfg(windows)]
+        {
+            // This prevents terminal popups on Windows
+            const CREATE_NO_WINDOW: u32 = 0x08000000;
+            cmd.creation_flags(CREATE_NO_WINDOW);
+        }
+
+        cmd.spawn().ok()
+    }
+
+    let mut child = match spawn_git_hidden(&path) {
+        Some(child) => child,
+        None => return Ok(None), // Failed to launch
+    };
+
+    let timeout = Duration::from_millis(100);
+    match child.wait_timeout(timeout).unwrap() {
+        Some(status) => {
+            if status.success() {
+                let mut stdout = String::new();
+                if let Some(mut out) = child.stdout.take() {
+                    out.read_to_string(&mut stdout).ok();
+                }
+                Ok(Some(stdout.trim().to_string()))
             } else {
-                // Git ran, but failed (e.g., not a Git repo)
-                Ok(None)
+                Ok(None) // Git ran, but not a repo or failed
             }
         }
-        Err(_) => {
-            // Git isn't installed or couldn't be executed
-            Ok(None)
+        None => {
+            let _ = child.kill();
+            Ok(None) // Timed out
         }
     }
 }

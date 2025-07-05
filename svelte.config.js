@@ -12,7 +12,7 @@ const config = {
       "@components": "./src/components",
       "@type": "./src/types"
     },
-    adapter: adapter(),
+    adapter: adapter({ fallback: "index.html" }),
   },
 };
 

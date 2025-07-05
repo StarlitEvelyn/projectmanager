@@ -2,6 +2,8 @@
 
 The project manager is an application helping for you to manage all of your projects in a neat and clean UI. Allows for you to tag your projects, open them in your code editor or directly on github.
 
+![ProjectManger](https://github.com/user-attachments/assets/225796a7-17d7-4959-beca-e22640190a9c)
+
 ## Install
 
 To install the app you can just go to the [releases](https://github.com/StarlitEvelyn/projectmanager/releases/latest), currently there's only windows installers. After downloading just run the installer and you can install the program like any other!

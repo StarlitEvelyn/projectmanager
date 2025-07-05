@@ -10,39 +10,68 @@
 		secletedIndex: number;
 	};
 
+	const filters = ["Imported", "Unimported"];
+
 	let { projects, secletedIndex = $bindable() }: Props = $props();
 
 	let query = $state("");
 
 	let search = (query: string) => {
 		query = query.toLowerCase().trim();
+
+		const special = query.match(/#([^ ]+)/);
+		const search = special ? query.slice(special[0].length + 1) : query;
+
 		if (query.length === 0)
 			return projects.map((p, i) => ({ project: p, index: i }));
 
-		return projects
+		const result = projects
 			.map((p, i) => ({ project: p, index: i }))
 			.filter(
 				({ project }) =>
-					project.title.toLowerCase().includes(query) ||
-					project.description.includes(query) ||
+					project.title.toLowerCase().includes(search) ||
+					project.description.includes(search) ||
 					project.tags.some((tag) => {
-						return tag.toLowerCase().includes(query);
+						return tag.toLowerCase().includes(search);
 					}),
 			);
+
+		if (!special) return result;
+
+		switch (special[0].toLowerCase()) {
+			case "#imported":
+				return result.filter(({ project }) => project.hasConfig === true);
+			case "#unimported":
+				return result.filter(({ project }) => project.hasConfig === false);
+		}
+
+		return result;
 	};
 </script>
 
 <div class="h-screen w-screen flex flex-col relative">
-	<div class="flex items-center">
-		<SearchBar bind:query />
-		<button
-			onclick={() => {
-				goto("settings");
-			}}
-			class="flex justify-center items-center cursor-pointer rounded text-white bg-zinc-900 h-10 w-10"
-		>
-			<Settings />
-		</button>
+	<div class="flex flex-col">
+		<div class="flex items-center">
+			<SearchBar bind:query />
+			<button
+				onclick={() => {
+					goto("settings");
+				}}
+				class="flex justify-center items-center cursor-pointer rounded text-white bg-zinc-900 h-10 w-10"
+			>
+				<Settings />
+			</button>
+		</div>
+		<div class="flex gap-2 px-2">
+			{#each filters as filter}
+				<button
+					onclick={() => {
+						query = "#" + filter;
+					}}
+					class="text-white bg-zinc-900 p-1 px-2 rounded">{filter}</button
+				>
+			{/each}
+		</div>
 	</div>
 	{#if projects.length > 0}
 		<div

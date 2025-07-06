@@ -13,6 +13,6 @@
 	<TitleBar />
 	<div class="flex gap-2 mt-2 h-full">
 		<SettingsCategories {categories} bind:selected />
-		<SettingsMenu />
+		<SettingsMenu {selected} />
 	</div>
 </main>

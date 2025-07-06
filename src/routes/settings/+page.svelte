@@ -3,7 +3,8 @@
 	import SettingsMenu from "@components/settings/SettingsMenu.svelte";
 	import TitleBar from "@components/settings/TitleBar.svelte";
 
-	const categories = ["General", "System"];
+	const categories = ["General"];
+	let selected = $state("General");
 </script>
 
 <main
@@ -11,7 +12,7 @@
 >
 	<TitleBar />
 	<div class="flex gap-2 mt-2 h-full">
-		<SettingsCategories {categories} />
+		<SettingsCategories {categories} bind:selected />
 		<SettingsMenu />
 	</div>
 </main>

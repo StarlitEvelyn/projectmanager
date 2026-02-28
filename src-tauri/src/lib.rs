@@ -2,7 +2,9 @@
 fn open_vscode(path: Option<String>) -> Result<(), String> {
     use std::process::Command;
 
-    // Make sure works on all platforms
+    #[cfg(windows)]
+    use std::os::windows::process::CommandExt;
+
     let code_cmd = if cfg!(target_os = "windows") {
         "code.cmd"
     } else {
@@ -13,6 +15,13 @@ fn open_vscode(path: Option<String>) -> Result<(), String> {
 
     if let Some(p) = path {
         cmd.arg(p);
+    }
+
+    #[cfg(windows)]
+    {
+        // Prevents console window from popping up
+        const CREATE_NO_WINDOW: u32 = 0x08000000;
+        cmd.creation_flags(CREATE_NO_WINDOW);
     }
 
     cmd.spawn()
